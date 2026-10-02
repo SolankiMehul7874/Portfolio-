@@ -1,69 +1,117 @@
-import Image from "next/image";
+'use client'
+
+import NextDynamic from 'next/dynamic'
+import { useState, useEffect } from 'react'
+import { HUD } from '@/components/ui/HUD'
+import { LoadingScreen } from '@/components/ui/LoadingScreen'
+import { AccessibleContent } from '@/components/ui/AccessibleContent'
+import { useWorldProgress } from '@/hooks/useWorldProgress'
+import { MistTransition } from '@/components/transitions/MistTransition'
+import { ProfessionalSection } from '@/components/professional/ProfessionalSection'
+import { LiquidTransition } from '@/components/transitions/LiquidTransition'
+import { CertificateSection } from '@/components/certificates/CertificateSection'
+import { DissolveTransition } from '@/components/transitions/DissolveTransition'
+import { ConnectionSection } from '@/components/connection/ConnectionSection'
+
+// Dynamically import 3D WebGL components with ssr: false
+const ExperienceCanvas = NextDynamic(
+  () =>
+    import('@/components/world/ExperienceCanvas').then(
+      (mod) => mod.ExperienceCanvas
+    ),
+  { ssr: false }
+)
+
+const ProjectsShowcase = NextDynamic(
+  () =>
+    import('@/components/showcase/ProjectsShowcase').then(
+      (mod) => mod.ProjectsShowcase
+    ),
+  { ssr: false }
+)
 
 export default function Home() {
+  const [webGLError, setWebGLError] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+
+  // Initialize Lenis smooth scroll and map progress to four-part state store
+  useWorldProgress()
+
+  useEffect(() => {
+    setIsMounted(true)
+    try {
+      const canvas = document.createElement('canvas')
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
+      if (!gl) setWebGLError(true)
+    } catch {
+      setWebGLError(true)
+    }
+  }, [])
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="relative min-h-screen bg-[#050608] text-neutral-100 selection:bg-cyan-500 selection:text-black">
+      {/* ==================================================== */}
+      {/* INITIAL BOOTUP LOADING SCREEN OVERLAY                */}
+      {/* ==================================================== */}
+      <LoadingScreen />
+
+      {/* ==================================================== */}
+      {/* PART 1 — 4D CINEMATIC WORLD / LANDING                */}
+      {/* ==================================================== */}
+      {isMounted && !webGLError ? (
+        <ExperienceCanvas onWebGLError={() => setWebGLError(true)} />
+      ) : (
+        /* Atmospheric CSS Fallback if WebGL fails or during SSR */
+        <div className="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-900 via-[#050608] to-black opacity-80" />
+      )}
+
+      {isMounted && (
+        <>
+          {/* ==================================================== */}
+          {/* TRANSITION A — PART 1 → PART 2 (ENTERING MIST)       */}
+          {/* ==================================================== */}
+          <MistTransition />
+
+          {/* ==================================================== */}
+          {/* PART 2 — PROFESSIONAL PORTFOLIO                      */}
+          {/* Skills + Experience + Academic Journey               */}
+          {/* ==================================================== */}
+          <ProfessionalSection />
+
+          {/* ==================================================== */}
+          {/* TRANSITION B — PART 2 → PART 3 (UI BECOMES LIQUID)   */}
+          {/* ==================================================== */}
+          <LiquidTransition />
+
+          {/* ==================================================== */}
+          {/* PART 3 — EXPERIMENTAL SHOWCASE                       */}
+          {/* 3A: WebGL Projects Centerpiece & 3D Spatial Carousel */}
+          {/* 3B: 3D Certificate Deck & Verified Achievements     */}
+          {/* ==================================================== */}
+          <ProjectsShowcase />
+          <CertificateSection />
+
+          {/* ==================================================== */}
+          {/* TRANSITION C — PART 3 → PART 4 (DISSOLVES)           */}
+          {/* ==================================================== */}
+          <DissolveTransition />
+
+          {/* ==================================================== */}
+          {/* PART 4 — GITHUB + CONTACT DESTINATION                */}
+          {/* ==================================================== */}
+          <ConnectionSection />
+
+          {/* ==================================================== */}
+          {/* GLOBAL CINEMATIC HUD & TELEMETRY                    */}
+          {/* ==================================================== */}
+          <HUD />
+
+          {/* ==================================================== */}
+          {/* ACCESSIBLE DOM NARRATIVE & SCROLL TIMELINE TRACK    */}
+          {/* ==================================================== */}
+          <AccessibleContent />
+        </>
+      )}
     </div>
-  );
+  )
 }
