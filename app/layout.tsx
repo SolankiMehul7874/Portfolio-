@@ -22,6 +22,15 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: `${siteConfig.name} — ${siteConfig.role}`,
   description: `Portfolio of ${siteConfig.name} — Software Engineer specializing in Backend Systems, Flutter, Android, and Applied Machine Learning.`,
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: 'any' },
+    ],
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
   openGraph: {
     title: `${siteConfig.name} — Software Engineer Portfolio`,
     description: siteConfig.tagline,

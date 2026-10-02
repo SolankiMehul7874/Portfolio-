@@ -44,6 +44,12 @@ next-env.d.ts
 *.png
 *.jpg
 *.jpeg
+!public/*.png
+!public/*.jpg
+!public/*.jpeg
+!app/*.png
+!app/*.jpg
+!app/*.jpeg
 
 # prompts
 prompt/
