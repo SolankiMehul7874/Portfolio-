@@ -55,7 +55,7 @@ export function ExperienceCanvas({ onWebGLError }: ExperienceCanvasProps) {
     >
       <Canvas
         className="pointer-events-auto"
-        shadows={quality !== 'low' ? 'pcf' : false}
+        shadows={quality !== 'low' ? 'percentage' : false}
         dpr={dpr as [number, number]}
         frameloop={isPart1Active ? 'always' : 'never'}
         camera={{ position: [0, 1.85, 5.2], fov: 48, near: 0.05, far: 100 }}
